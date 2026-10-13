@@ -1,0 +1,46 @@
+{
+  "name": "ghostlink-v12-communes",
+  "productName": "GHOSTLINK V26.8 Enemy Tactics",
+  "version": "26.8.0-beta.1",
+  "description": "KINSHASA 243 : GHOSTLINK — Val Industries Corporate Technologies. Beat'em up d'arcade par JOE-VALLY.",
+  "author": "JOE-VALLY",
+  "license": "UNLICENSED",
+  "main": "electron/main.js",
+  "scripts": {
+    "serve": "npx --yes http-server . -p 8080 -c-1",
+    "web:build": "node -e \"const fs=require('fs');fs.rmSync('www',{recursive:true,force:true});fs.mkdirSync('www');for(const f of ['index.html','manifest.webmanifest','css','js','assets'])fs.cpSync(f,'www/'+f,{recursive:true});\"",
+    "android:add": "npm run web:build && npx cap add android",
+    "android:sync": "npm run web:build && npx cap sync android",
+    "android:open": "npx cap open android",
+    "desktop": "electron .",
+    "dist:linux": "electron-builder --linux AppImage",
+    "dist:win": "electron-builder --win nsis portable"
+  },
+  "devDependencies": {
+    "@capacitor/android": "^6.1.0",
+    "@capacitor/cli": "^6.1.0",
+    "@capacitor/core": "^6.1.0",
+    "electron": "^31.0.0",
+    "electron-builder": "^24.13.0"
+  },
+  "build": {
+    "appId": "cd.joevally.ghostlink12",
+    "productName": "GHOSTLINK V26.8 Enemy Tactics",
+    "files": [
+      "index.html",
+      "manifest.webmanifest",
+      "css/**",
+      "js/**",
+      "assets/**",
+      "electron/**"
+    ],
+    "linux": {
+      "target": "AppImage",
+      "category": "Game",
+      "icon": "assets/icon-512.png"
+    },
+    "win": {
+      "icon": "assets/icon-512.png"
+    }
+  }
+}

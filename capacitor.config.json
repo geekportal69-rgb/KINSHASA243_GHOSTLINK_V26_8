@@ -1,0 +1,7 @@
+{
+  "appId": "cd.joevally.ghostlink12",
+  "appName": "GHOSTLINK V12",
+  "webDir": "www",
+  "android": { "backgroundColor": "#0b0710", "allowMixedContent": false },
+  "plugins": { "SplashScreen": { "launchShowDuration": 0 } }
+}

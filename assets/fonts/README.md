@@ -1,0 +1,1 @@
+Les fichiers de polices ne sont pas redistribués. Copiez assets/fonts depuis votre propre 243.zip, ou exécutez `python tools/restore_fonts.py <chemin-vers-243.zip>` puis régénérez le cache. Les polices de substitution permettent au jeu de démarrer sans eux.

@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b0710" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>KINSHASA 243 : GHOSTLINK — Les 24 communes</title>
+  <meta name="description" content="Beat'em up mobile original : 24 niveaux dans les 24 communes de Kinshasa. Kabongo, Nzinga et Makasi contre le Baron et le réseau GHOSTLINK de Val Industries." />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="assets/icon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+<div id="app">
+  <div id="view">
+    <canvas id="game" aria-label="Zone de jeu"></canvas>
+
+    <!-- ===== HUD ===== -->
+    <div id="hud" aria-live="polite">
+      <div class="pcard" id="hud-p1" data-p="0">
+        <div class="pc-face"><img alt="" /></div>
+        <div class="pc-main">
+          <div class="pc-top"><b class="pc-name">KABONGO</b><span class="pc-score">0</span></div>
+          <div class="pc-bar"><i class="pc-rec"></i><i class="pc-hp"></i></div>
+          <div class="pc-bot"><span class="pc-lives">×3</span><span class="pc-stars"></span><span class="pc-weapon"></span></div>
+        </div>
+      </div>
+      <div class="pcard p2" id="hud-p2" data-p="1">
+        <div class="pc-face"><img alt="" /></div>
+        <div class="pc-main">
+          <div class="pc-top"><b class="pc-name">NZINGA</b><span class="pc-score">0</span></div>
+          <div class="pc-bar"><i class="pc-rec"></i><i class="pc-hp"></i></div>
+          <div class="pc-bot"><span class="pc-lives">×3</span><span class="pc-stars"></span><span class="pc-weapon"></span></div>
+        </div>
+      </div>
+      <button id="btn-pause" class="hud-btn" aria-label="Pause"><svg viewBox="0 0 24 24" width="18" height="18"><path d="M7 5h3.4v14H7zM13.6 5H17v14h-3.4z" fill="currentColor"/></svg></button>
+      <div id="enemybar"><div class="eb-name"><b></b><span></span></div><div class="eb-bar"><i class="eb-lag"></i><i class="eb-hp"></i></div><div class="eb-layers"></div></div>
+      <div id="fps" aria-hidden="true"></div>
+    <div id="combo"><b>0</b><span>COUPS</span><em class="cb-pts"></em></div>
+      <div id="go">GO<svg viewBox="0 0 40 24" width="30" height="18"><path d="M2 8h22V2l14 10-14 10v-6H2z" fill="currentColor" stroke="#0b0710" stroke-width="2.4" stroke-linejoin="round"/></svg></div>
+      <div id="banner"><b></b><span></span></div>
+      <div id="toast"></div>
+      <div id="padtoast"></div>
+      <div id="stagecard"><span class="sc-kick"></span><b class="sc-commune"></b><b class="sc-name"></b><p class="sc-text"></p><div class="sc-recit"><span>RÉCIT DU CONGO</span><b class="sc-rt"></b><p class="sc-rx"></p></div></div>
+      <div id="bosscard"><img alt="" /><div class="bc-txt"><span class="bc-title"></span><b class="bc-name"></b><p class="bc-line"></p></div></div>
+    </div>
+  </div>
+
+  <!-- ===== Commandes tactiles ===== -->
+  <div id="controls" aria-hidden="true">
+    <div id="stick-zone"><div id="stick-base"><div id="stick-knob"></div></div></div>
+    <div id="btn-zone">
+      <button class="tb tb-star" data-b="star"><svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.5 1.3 6.6L12 17.2l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z" fill="currentColor"/></svg><em>0</em></button>
+      <button class="tb tb-spe" data-b="spe"><span>SPÉCIAL</span></button>
+      <button class="tb tb-back" data-b="back"><span>DOS</span></button>
+      <button class="tb tb-dash" data-b="dash"><span>DASH</span></button>
+      <button class="tb tb-jump" data-b="jump"><span>SAUT</span></button>
+      <button class="tb tb-atk" data-b="atk"><span>COUP</span></button>
+    </div>
+    <button id="btn-pick" class="pick-btn" data-b="interact" aria-label="Ramasser l'arme au sol">RAMASSER</button>
+  </div>
+
+  <!-- ===== Écrans ===== -->
+  <section class="screen active" id="scr-boot">
+    <div class="boot-in">
+      <div class="logo-mini">KINSHASA 243</div>
+      <div class="boot-title">GHOSTLINK</div>
+      <div class="boot-bar"><i></i></div>
+      <button id="btn-boot" class="btn-yel" disabled>CHARGEMENT…</button>
+      <div class="boot-rec">
+        <div><svg viewBox="0 0 40 32" width="34" height="27" aria-hidden="true"><path d="M6 20v-4a14 14 0 0 1 28 0v4" fill="none" stroke="currentColor" stroke-width="3"/><rect x="3" y="18" width="8" height="12" rx="2" fill="currentColor"/><rect x="29" y="18" width="8" height="12" rx="2" fill="currentColor"/></svg><span><b>CASQUE</b> son 3D binaural</span></div>
+        <div><svg viewBox="0 0 48 32" width="38" height="26" aria-hidden="true"><path d="M12 4h24c6 0 10 6 11 14 1 7-3 11-7 9l-6-5H14l-6 5c-4 2-8-2-7-9C2 10 6 4 12 4z" fill="none" stroke="currentColor" stroke-width="3"/><path d="M12 12v8M8 16h8" stroke="currentColor" stroke-width="3"/><circle cx="34" cy="13" r="2.4" fill="currentColor"/><circle cx="38" cy="18" r="2.4" fill="currentColor"/></svg><span><b>MANETTE</b> recommandée</span></div>
+      </div>
+      <p class="boot-hint">Jouez avec un casque et une manette pour la meilleure expérience · Portrait ou paysage</p>
+      <p class="offline" id="offline-state"></p>
+      <p class="boot-diagnostic" id="boot-assets" role="status" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <section class="screen" id="scr-title">
+    <div class="title-art"><img src="assets/img/keyart.webp" alt="Kabongo, Nzinga et Makasi sur un boulevard de Kinshasa sous la pluie" /></div>
+    <div class="title-shade"></div>
+    <div class="title-logo">
+      <span class="tl-kick">KINSHASA 243</span>
+      <h1 class="tl-main">GHOST<em>LINK</em></h1>
+      <span class="tl-sub">LES 24 COMMUNES</span>
+    </div>
+    <nav class="title-menu">
+      <button class="mbtn hero-btn" id="btn-story"><span>HISTOIRE</span></button>
+      <button class="mbtn" id="btn-coop"><span>COOP LOCALE</span></button>
+      <button class="mbtn" id="btn-stages"><span>CARTE DE KIN</span></button>
+      <button class="mbtn" id="btn-records"><span>RECORDS & MÉDAILLES</span></button>
+      <div class="mrow"><button class="mbtn sm" id="btn-options"><span>RÉGLAGES</span></button><button class="mbtn sm" id="btn-credits"><span>CRÉDITS</span></button></div>
+      <p class="best">Record : <b id="best">0</b></p>
+      <p class="ver">V26.8 · ENEMY TACTICS · <span id="title-pad">Casque + manette recommandés</span></p>
+    </nav>
+  </section>
+
+  <section class="screen" id="scr-select">
+    <header class="sel-head"><button class="back" data-back aria-label="Retour">‹</button><h2 id="sel-title">CHOISIS TON COMBATTANT</h2></header>
+    <div class="sel-cards" id="sel-cards"></div>
+    <div class="sel-info" id="sel-info">
+      <div class="si-top"><b class="si-name"></b><span class="si-title"></span></div>
+      <p class="si-desc"></p>
+      <div class="si-stats"></div>
+      <button class="btn-yel" id="btn-confirm">CONFIRMER</button>
+    </div>
+  </section>
+
+  <section class="screen" id="scr-story">
+    <div class="panel-frame"><img id="story-img" alt="" /></div>
+    <div class="caption"><p id="story-text"></p><span class="cap-next">▶</span></div>
+    <button class="skip" id="btn-skip">PASSER ▸▸</button>
+  </section>
+
+  <section class="screen" id="scr-stages">
+    <header class="sel-head"><button class="back" data-back aria-label="Retour">‹</button><h2>LES 24 COMMUNES</h2><span class="map-prog" id="map-prog"></span></header>
+    <div class="stage-list" id="stage-list"></div>
+  </section>
+
+  <section class="screen" id="scr-records">
+    <header class="sel-head"><button class="back" data-back aria-label="Retour">‹</button><h2>REGISTRE DES EXPLOITS</h2><span class="map-prog">V26.8</span></header>
+    <div class="record-scroll">
+      <p class="record-intro">Les records se sauvegardent après une victoire. Les résultats des anciennes versions sont préservés.</p>
+      <div class="record-transfer">
+        <button id="btn-records-export" type="button">EXPORTER MA SAUVEGARDE</button>
+        <button id="btn-records-import" type="button">IMPORTER UNE SAUVEGARDE</button>
+        <input id="records-file" type="file" accept=".json,application/json" hidden aria-label="Choisir un fichier de sauvegarde" />
+      </div>
+      <div class="record-summary" id="record-summary"></div>
+      <div id="record-list" class="record-list"></div>
+    </div>
+  </section>
+
+  <section class="screen sheet" id="scr-options">
+    <div class="sheet-in wide">
+      <header class="sheet-head"><h2>RÉGLAGES</h2><button class="x" data-back aria-label="Fermer">✕</button></header>
+      <nav class="tabs" role="tablist">
+        <button class="tab on" data-tab="jeu" role="tab">JEU</button>
+        <button class="tab" data-tab="ctl" role="tab">CONTRÔLES</button>
+        <button class="tab" data-tab="pad" role="tab">MANETTE</button>
+        <button class="tab" data-tab="audio" role="tab">AUDIO</button>
+        <button class="tab" data-tab="video" role="tab">VIDÉO</button>
+        <button class="tab" data-tab="acc" role="tab">ACCÈS</button>
+      </nav>
+      <p class="tab-hint pad-only">LB / RB : changer d'onglet · B : fermer</p>
+
+      <div class="pane on" data-pane="jeu">
+        <div class="opt"><label>Difficulté</label><div class="seg" data-opt="diff"><button data-v="0">Facile</button><button data-v="1">Normal</button><button data-v="2">Difficile</button><button data-v="3">Mania</button></div></div>
+        <div class="opt"><label>Combo automatique <small>Oui : maintenir pour enchaîner · Non : maintenir 0,55 s puis relâcher pour un coup chargé</small></label><div class="seg" data-opt="hold"><button data-v="1">Oui</button><button data-v="0">Non</button></div></div>
+        <div class="opt"><label>Aide à la visée <small>se tourner vers l'ennemi</small></label><div class="seg" data-opt="assist"><button data-v="1">Oui</button><button data-v="0">Non</button></div></div>
+        <div class="opt"><label>Course automatique <small>maintenir la direction</small></label><div class="seg" data-opt="autorun"><button data-v="1">Oui</button><button data-v="0">Non</button></div></div>
+        <div class="opt"><label>Fenêtre de parade</label><div class="seg" data-opt="parryWin"><button data-v="1">Normale</button><button data-v="2">Large</button><button data-v="0">Désactivée</button></div></div>
+        <details class="howto"><summary>Commandes et techniques</summary>
+          <ul>
+            <li><b>COUP</b> enchaîne les combos · maintenir = combo automatique · en l'air : attaque sautée · sur une arme : la ramasser.</li>
+            <li><b>DASH</b> éclair invulnérable (au sol et en l'air), annule un coup qui touche · dash + COUP = attaque en course. DOS + direction fait aussi un dash.</li>
+            <li><b>PARADE</b> (façon Ori 2) : DOS ou DASH juste avant d'être touché → l'ennemi est sonné, les projectiles sont renvoyés.</li>
+            <li><b>ESQUIVE PARFAITE</b> : traverser une attaque pendant un dash → ralenti, le coup suivant fait +50 % (CONTRE).</li>
+            <li><b>DOS</b> seul : attaque arrière (demi-tour + frappe). Un coup qui touche peut s'annuler en attaque arrière.</li>
+            <li><b>SAUT</b> en l'air = <b>double saut</b> en salto · SAUT pendant une chute = rétablissement.</li>
+            <li><b>Saut variable</b> (manette et clavier) : relâchez SAUT tôt pour un petit saut.</li>
+            <li><b>Physique</b> : les ennemis lourds reculent moins ; un ennemi projeté contre le bord de l'écran rebondit (<b>MUR !</b>) ; un gros coup l'envoie dans ses alliés (<b>DOMINO !</b>) ; sur sol mouillé, on glisse plus loin.</li>
+            <li><b>SPÉCIAL</b> coûte un peu de vie (partie verte), récupérée en frappant. Avec une direction : spécial avant. En l'air : spécial aérien. Sert aussi à se dégager.</li>
+            <li>Double-tap avant = <b>course</b> · course + COUP = attaque en course · course + SPÉCIAL = <b>BLITZ</b>.</li>
+            <li><b>RAMASSER</b> une arme : E/V (J1), Pavé 0/N (J2), View/Share sur manette, bouton contextuel sur téléphone. <b>COUP n'est jamais consommé par le ramassage.</b></li>
+            <li>Avec une arme : COUP frappe, SPÉCIAL la <b>lance</b>.</li>
+            <li>Marchez contre un ennemi pour le <b>saisir</b> : COUP = genou, COUP + arrière ou DOS = projection, SAUT = passer de l'autre côté.</li>
+            <li>Saisi par un molosse ? <b>Martelez</b> les boutons ou utilisez SPÉCIAL pour vous libérer.</li>
+            <li><b>Points de combo</b> : encaissés à la fin du combo, perdus si vous êtes touché avant. Une vie bonus tous les 50 000 points.</li>
+            <li><b>★</b> coup étoile : frappe tout l'écran. Ramassez des étoiles pour recharger.</li>
+          </ul>
+        </details>
+      </div>
+
+      <div class="pane" data-pane="ctl">
+        <div class="opt"><label>Disposition tactile</label><div class="seg" data-opt="layout"><button data-v="1">Arc (Diablo)</button><button data-v="0">Classique</button></div></div>
+        <div class="layout-preview" aria-hidden="true"><i class="lp-a">COUP</i><i class="lp-j">SAUT</i><i class="lp-d">DASH</i><i class="lp-s">SPÉ</i><i class="lp-b">DOS</i><i class="lp-st">★</i></div>
+        <div class="opt"><label>Main</label><div class="seg" data-opt="lefty"><button data-v="0">Droitier</button><button data-v="1">Gaucher</button></div></div>
+        <div class="opt"><label>Taille des boutons <output data-out="size"></output></label><input type="range" min="80" max="130" step="5" data-opt="size" /></div>
+        <div class="opt"><label>Opacité des boutons <output data-out="opac"></output></label><input type="range" min="35" max="100" step="5" data-opt="opac" /></div>
+        <div class="opt"><label>Vibrations du téléphone</label><div class="seg" data-opt="haptics"><button data-v="1">Oui</button><button data-v="0">Non</button></div></div>
+        <p class="note">Clavier J1 : Q/A·D·Z/W·S déplacer, F/J coup, Espace/K saut, H/L spécial, R/U dos, Maj/O dash, T/I étoile, Échap pause. J2 : flèches, Pavé 1-6 ou , . / M ' ; · Ramasser J1 : E/V · J2 : Pavé 0/N</p>
+      </div>
+
+      <div class="pane" data-pane="pad">
+        <div class="pad-status" id="pad-status"><b>Aucune manette détectée</b><span>Branchez ou appairez une manette Bluetooth (Xbox, PlayStation, compatible), puis appuyez sur un bouton.</span></div>
+        <div class="rec"><svg viewBox="0 0 48 32" width="42" height="28" aria-hidden="true"><path d="M12 4h24c6 0 10 6 11 14 1 7-3 11-7 9l-6-5H14l-6 5c-4 2-8-2-7-9C2 10 6 4 12 4z" fill="none" stroke="currentColor" stroke-width="3"/><path d="M12 12v8M8 16h8" stroke="currentColor" stroke-width="3"/><circle cx="34" cy="13" r="2.4" fill="currentColor"/><circle cx="38" cy="18" r="2.4" fill="currentColor"/></svg><p><b>Manette recommandée.</b> Le jeu est pensé pour la précision d'une manette : parades, dash et combos au millimètre.</p></div>
+        <div class="opt"><label>Symboles des boutons</label><div class="seg" data-opt="glyph"><button data-v="0">Xbox</button><button data-v="1">PlayStation</button></div></div>
+        <div class="opt"><label>Vibrations de la manette</label><div class="seg" data-opt="rumble"><button data-v="1">Oui</button><button data-v="0">Non</button></div></div>
+        <div class="padmap" id="padmap"></div>
+        <p class="note">Les menus se pilotent entièrement à la manette : croix ou stick pour se déplacer, A / Croix pour valider, B / Rond pour revenir.</p>
+      </div>
+
+      <div class="pane" data-pane="audio">
+        <div class="rec"><svg viewBox="0 0 40 32" width="38" height="30" aria-hidden="true"><path d="M6 20v-4a14 14 0 0 1 28 0v4" fill="none" stroke="currentColor" stroke-width="3"/><rect x="3" y="18" width="8" height="12" rx="2" fill="currentColor"/><rect x="29" y="18" width="8" height="12" rx="2" fill="currentColor"/></svg><p><b>Jouez au casque.</b> Le mode Casque 3D place chaque coup, chaque ennemi et chaque projectile autour de vous (son binaural).</p></div>
+        <div class="opt"><label>Volume général <output data-out="master"></output></label><input type="range" min="0" max="100" step="5" data-opt="master" /></div>
+        <div class="opt"><label>Musique <output data-out="music"></output></label><input type="range" min="0" max="100" step="5" data-opt="music" /></div>
+        <div class="opt"><label>Effets sonores <output data-out="sfx"></output></label><input type="range" min="0" max="100" step="5" data-opt="sfx" /></div>
+        <div class="opt"><label>Mode audio</label><div class="seg" data-opt="amode"><button data-v="1">Casque 3D</button><button data-v="0">Stéréo</button><button data-v="2">Mono</button></div></div>
+        <div class="opt"><label>Plage dynamique</label><div class="seg" data-opt="dyn"><button data-v="0">Cinéma</button><button data-v="1">Nuit</button></div></div>
+        <div class="opt"><label>Acoustique des lieux <small>réverbération rue / hall / tunnel</small></label><div class="seg" data-opt="env"><button data-v="1">Oui</button><button data-v="0">Non</button></div></div>
+        <div class="opt"><label>Cœur et filtre à faible vie</label><div class="seg" data-opt="heart"><button data-v="1">Oui</button><button data-v="0">Non</button></div></div>
+        <button class="mbtn sm" id="btn-audio-test"><span>TESTER LE SON 3D</span></button>
+        <p class="note">Dolby Atmos n'est pas disponible dans un navigateur ni dans une application web. Le mode Casque 3D utilise le rendu binaural HRTF de Web Audio, qui donne une sensation de son en 3D avec n'importe quel casque.</p>
+      </div>
+
+      <div class="pane" data-pane="video">
+        <div class="opt"><label>Qualité graphique</label><div class="seg" data-opt="fx"><button data-v="2">Ultra</button><button data-v="1">Équilibré</button><button data-v="0">Éco</button></div></div>
+        <div class="opt"><label>Images par seconde</label><div class="seg" data-opt="fpscap"><button data-v="30">30</button><button data-v="60">60</button><button data-v="120">120</button><button data-v="0">Max</button></div></div>
+        <div class="opt"><label>Résolution dynamique <small>baisse si le jeu ralentit</small></label><div class="seg" data-opt="dynres"><button data-v="1">Oui</button><button data-v="0">Non</button></div></div>
+        <div class="opt"><label>Échelle de rendu <output data-out="rscale"></output></label><input type="range" min="50" max="100" step="5" data-opt="rscale" /></div>
+        <div class="opt"><label>Tremblement d'écran</label><div class="seg" data-opt="shake"><button data-v="1">Oui</button><button data-v="0">Réduit</button></div></div>
+        <div class="opt"><label>Afficher les FPS</label><div class="seg" data-opt="fpsShow"><button data-v="1">Oui</button><button data-v="0">Non</button></div></div>
+        <p class="note" id="perf-note"></p>
+      </div>
+
+      <div class="pane" data-pane="acc">
+        <div class="opt"><label>Réduire les flashs</label><div class="seg" data-opt="noflash"><button data-v="1">Oui</button><button data-v="0">Non</button></div></div>
+        <div class="opt"><label>Vitesse du jeu <output data-out="gspeed"></output></label><input type="range" min="70" max="100" step="5" data-opt="gspeed" /></div>
+        <p class="note">La vitesse réduite et la fenêtre de parade large (onglet Jeu) rendent les combats plus accessibles sans changer la difficulté.</p>
+        <button class="mbtn sm" id="btn-reset-opts"><span>RÉGLAGES PAR DÉFAUT</span></button>
+      </div>
+    </div>
+  </section>
+
+  <section class="screen sheet" id="scr-credits">
+    <div class="sheet-in">
+      <header class="sheet-head"><h2>CRÉDITS</h2><button class="x" data-back aria-label="Fermer">✕</button></header>
+      <div class="cred-hero"><span>Développeur principal</span><b>JOE-VALLY</b></div>
+      <p>KINSHASA 243 : GHOSTLINK — Val Industries Corporate Technologies · V26.8 Enemy Tactics (base V12.4, Traversée V24, combat V21). Beat'em up mobile original : 24 niveaux dans les 24 communes de Kinshasa, personnages, histoire, musique et illustrations créés pour ce projet, en hommage aux grands jeux de bagarre de rue. Les « récits du Congo » s'appuient sur des faits historiques et culturels publics.</p>
+      <h3>Registre des contributeurs IA</h3>
+      <ul class="cred-list">
+        <li>ChatGPT / GPT — versions fondatrices</li>
+        <li>GPT-6 (déclaré) — V6, protocole des contributeurs</li>
+        <li>Gemini — itérations V6 à V9</li>
+        <li>Perplexity Computer — V4 Network, V9.1, V9.2 Visual, V10 Mobile, V11 Furie dans les rues, V12 à V12.4 (animations et physique)</li>
+        <li>OpenAI GPT-6 (ChatGPT) — V26 Reconstruction bêta : fusion V12.4/V24, mécanismes de convoi, sauvegardes, audit et tests statiques · 13 octobre 2026</li>
+        <li>OpenAI GPT-6 (ChatGPT) — V26.1 : restauration du coup chargé et du finisher 8+, tests de non-régression et documentation · 13 octobre 2026</li>
+        <li>OpenAI GPT-6 (ChatGPT) — V26.2 : records par niveau, médailles, migration additive des sauvegardes et registre des exploits · 13 octobre 2026</li>
+        <li>OpenAI GPT-6 (ChatGPT) — V26.3 : phases de Joe-Vally Déchu et balises de libération · 13 octobre 2026</li>
+        <li>OpenAI GPT-6 (ChatGPT) — V26.4 : barrages Kenge, garage Carly et motards alliés · 13 octobre 2026</li>
+        <li>OpenAI GPT-6 (ChatGPT) — V26.5 : course à l'inversion, interaction RAMASSER distincte de COUP, optimisation des jetons IA, diagnostic des ressources locales et tests · 13 octobre 2026 (brief de revue : Claude / Anthropic)</li>
+        <li>OpenAI GPT-6 (ChatGPT) — V26.6 : anticipation de saut à l'atterrissage, entrées conservées durant le hitstop, fenêtres de frappe robustes, hitbox colosse en profondeur et allocations réduites · 13 octobre 2026 (méthode de revue : Claude / Anthropic ; tests de simulation, validation PC/Android encore requise)</li>
+        <li>OpenAI GPT-6 (ChatGPT) — V26.7 : combos confirmés propres aux trois héros, fenêtres de récupération, reactions aux dégâts, anticipation de Makasi, tests et documentation · 13 octobre 2026 (brief d’audit proposé par Claude / Anthropic ; rendu et périphériques physiques à valider)</li>
+        <li>OpenAI GPT-6 (ChatGPT) — V26.8 : huit profils tactiques d’ennemis, jetons d’attaque temporaires, libération après interruption, drones limités, esquive de boxeuse avec délai, décision sans tableaux temporaires ; tests Node, comportement réel et FPS à valider · 13 octobre 2026 (méthode de revue inspirée du brief Claude / Anthropic)</li>
+      </ul>
+      <p class="small">Protocole : aucune contribution précédente n'est effacée. Chaque modification majeure est signée et datée dans JOURNAL_CONTRIBUTEURS_IA.md.</p>
+      <p class="small">Polices Anton et Barlow Condensed (SIL Open Font License). Musique « électro-rumba » et bruitages synthétisés en temps réel.</p>
+    </div>
+  </section>
+
+  <section class="screen sheet" id="scr-pause">
+    <div class="sheet-in narrow">
+      <header class="sheet-head"><h2>PAUSE</h2><span class="pause-sub" id="pause-sub"></span></header>
+      <div class="pause-stats" id="pause-stats"></div>
+      <button class="mbtn hero-btn" id="btn-resume"><span>REPRENDRE</span></button>
+      <button class="mbtn" id="btn-restart"><span>RECOMMENCER LE STAGE</span></button>
+      <button class="mbtn" id="btn-p-options"><span>RÉGLAGES</span></button>
+      <button class="mbtn" id="btn-quit"><span>MENU PRINCIPAL</span></button>
+    </div>
+  </section>
+
+  <section class="screen" id="scr-clear">
+    <div class="clear-in">
+      <div class="clear-head"><span id="clear-kick">COMMUNE 1</span><h2>RELAIS COUPÉ</h2></div>
+      <div class="tally" id="tally"></div>
+      <div class="rank" id="rank"><span>RANG</span><b>A</b></div>
+      <div class="clear-medals" id="clear-medals" aria-label="Médailles obtenues"></div>
+      <p class="clear-record" id="clear-record"></p>
+      <p class="clear-outro" id="clear-outro"></p>
+      <button class="btn-yel" id="btn-next">CONTINUER</button>
+    </div>
+  </section>
+
+  <section class="screen" id="scr-over">
+    <div class="over-in">
+      <h2>K.O.</h2>
+      <p>Continuer ?</p>
+      <div class="count" id="count">9</div>
+      <button class="btn-yel" id="btn-continue">CONTINUER</button>
+      <button class="mbtn" id="btn-over-menu"><span>ABANDONNER</span></button>
+    </div>
+  </section>
+
+  <section class="screen" id="scr-ending">
+    <div class="end-in">
+      <span class="tl-kick">FIN</span>
+      <h2>LES 24 COMMUNES SONT LIBRES</h2>
+      <div class="tally" id="end-tally"></div>
+      <p>Merci d'avoir joué. Développé par <b>JOE-VALLY</b>.</p>
+      <button class="btn-yel" id="btn-end">RETOUR AU MENU</button>
+    </div>
+  </section>
+
+  <section class="screen" id="scr-chapter">
+    <div class="chap-in">
+      <span class="chap-num" id="chap-num">CHAPITRE I</span>
+      <h2 class="chap-name" id="chap-name">TSHANGU</h2>
+      <span class="chap-sub" id="chap-sub"></span>
+      <p class="chap-text" id="chap-text"></p>
+      <div class="chap-communes" id="chap-communes"></div>
+      <button class="btn-yel" id="btn-chap">EN ROUTE</button>
+    </div>
+  </section>
+
+  <div id="fade"></div>
+</div>
+
+<script src="js/core.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/data.js"></script>
+<script src="js/rig.js"></script>
+<script src="js/game.js"></script>
+<script src="js/progression.js"></script>
+<script src="js/render.js"></script>
+<script src="assets/spr/meta.js"></script>
+<script src="js/sprites.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/pad.js"></script>
+</body>
+</html>
